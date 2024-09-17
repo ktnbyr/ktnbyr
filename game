@@ -1,0 +1,88 @@
+import random
+
+# Define the teams
+teams = ["Team A", "Team B"]
+
+# Initialize scores and innings
+scores = {"Team A": 0, "Team B": 0}
+current_inning = 1
+total_innings = 9
+
+# Function to simulate a play
+def play():
+    result = random.choices(['strikeout', 'hit', 'walk', 'home_run', 'out'], [0.2, 0.3, 0.1, 0.1, 0.3])[0]
+    if result == 'strikeout':
+        return 'strikeout'
+    elif result == 'hit':
+        return 'hit'
+    elif result == 'walk':
+        return 'walk'
+    elif result == 'home_run':
+        return 'home_run'
+    elif result == 'out':
+        return 'out'
+
+# Function to play an inning
+def play_inning(offense, defense):
+    bases = [False, False, False]  # Represent first, second, and third base
+    outs = 0
+    inning_score = 0
+
+    while outs < 3:
+        action = play()
+        if action == 'strikeout':
+            outs += 1
+        elif action == 'out':
+            outs += 1
+        elif action == 'walk':
+            for i in range(2, -1, -1):
+                if bases[i]:
+                    bases[i] = False
+                    if i == 2:
+                        inning_score += 1
+            bases[0] = True
+        elif action == 'hit':
+            for i in range(2, -1, -1):
+                if bases[i]:
+                    bases[i] = False
+                    if i == 2:
+                        inning_score += 1
+                    else:
+                        bases[i + 1] = True
+            bases[0] = True
+        elif action == 'home_run':
+            inning_score += bases.count(True) + 1
+            bases = [False, False, False]
+
+    return inning_score
+
+# Function to play the game
+def play_game():
+    global current_inning
+    while current_inning <= total_innings:
+        print(f"Inning {current_inning}:")
+        
+        # Team A bats
+        team_a_score = play_inning("Team A", "Team B")
+        scores["Team A"] += team_a_score
+        print(f"Team A scores {team_a_score} runs.")
+        
+        # Team B bats
+        team_b_score = play_inning("Team B", "Team A")
+        scores["Team B"] += team_b_score
+        print(f"Team B scores {team_b_score} runs.")
+        
+        print(f"Score after inning {current_inning}: Team A {scores['Team A']} - Team B {scores['Team B']}\n")
+        current_inning += 1
+
+    # Game result
+    print("Game Over!")
+    if scores["Team A"] > scores["Team B"]:
+        print(f"Team A wins {scores['Team A']} to {scores['Team B']}.")
+    elif scores["Team A"] < scores["Team B"]:
+        print(f"Team B wins {scores['Team B']} to {scores['Team A']}.")
+    else:
+        print(f"The game is a tie with {scores['Team A']} runs each.")
+
+# Run the game
+play_game()
